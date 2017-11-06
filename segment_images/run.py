@@ -1,5 +1,6 @@
-import os
 import platform
 
-message = "Using Python '{0}'".format(platform.python_version())
-print(message)
+
+if __name__ == '__main__':
+    print("Running the segment images function in the Active Learning Platform")
+    print("Using Python '{0}'".format(platform.python_version()))
