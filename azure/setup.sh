@@ -24,9 +24,9 @@ install_pip3()
 echo "Bootstraping Active Learning Platform..."
 
 echo "Checking requirements..."
-command -v git >/dev/null 2>&1 || { echo >&2 "Missing git."; install_git; }
-command -v python3 >/dev/null 2>&1 || { echo >&2 "Missing python."; install_python3; }
-command -v pip3 >/dev/null 2>&1 || { echo >&2 "Missing pip."; install_pip3; }
+command -v git >/dev/null 2>&1 || { echo "Missing git."; install_git; }
+command -v python3 >/dev/null 2>&1 || { echo "Missing python."; install_python3; }
+command -v pip3 >/dev/null 2>&1 || { echo "Missing pip."; install_pip3; }
 
 echo "Cloning WhiteboardLiveCoding/ActiveLearningPlatform..."
 git clone https://github.com/WhiteboardLiveCoding/ActiveLearningPlatform.git alp
