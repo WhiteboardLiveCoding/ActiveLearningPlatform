@@ -44,10 +44,13 @@ echo "Deploying CustomScript to Azure Linux VM..."
 echo "Checking requirements..."
 command -v az >/dev/null 2>&1 || { echo >&2 "Missing Azure CLI. Aborting."; exit 1; }
 
+# Exit if any step returns a non-zero exit code after this
+set -e
+
 echo "Please make sure that you have logged into the Azure CLI"
 
 echo "Starting vm '$VM_NAME' in the '$RESOURCE_GROUP' resource group..."
-az vm start -g $RESOURCE_GROUP -n $VM_NAME || { exit 1; }
+az vm start -g $RESOURCE_GROUP -n $VM_NAME
 
 echo "Creating CustomScript extension for the virtual machine..."
 az vm extension set \
@@ -55,7 +58,6 @@ az vm extension set \
 	--vm-name $VM_NAME \
 	--name CustomScript \
 	--publisher Microsoft.Azure.Extensions --version 2.0 \
-	--settings $SETTINGS \
-	|| { exit 1; }
+	--settings $SETTINGS
 
 echo "CustomScript deployed!"
