@@ -66,12 +66,12 @@ while [ "$1" != "" ]; do
 	shift
 done
 
-if [ $blob_account -eq "" ]; then
+if [[ -z "$blob_account" ]]; then
     echo "Please provide the Azure Blob Account"
     exit 1
 fi
 
-if [ $blob_key -eq "" ]; then
+if [[ -z "$blob_key" ]]; then
     echo "Please provide the Azure Blob Key"
     exit 1
 fi
