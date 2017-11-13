@@ -97,7 +97,7 @@ echo "Installing project requirements..."
 pip3 install -r requirements.txt
 
 echo "Running [alp.py]..."
-python3 alp.py
+python3 alp.py -i pictures -a code
 
 if [ $? -eq 69 ]; then
     exit 0
