@@ -1,4 +1,3 @@
 {
-  "fileUris": ["https://raw.githubusercontent.com/WhiteboardLiveCoding/ActiveLearningPlatform/master/azure/setup.sh"],
-  "commandToExecute": "./setup.sh"
+  "fileUris": ["https://raw.githubusercontent.com/WhiteboardLiveCoding/ActiveLearningPlatform/master/azure/setup.sh"]
 }
