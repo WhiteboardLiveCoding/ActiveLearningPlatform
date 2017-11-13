@@ -92,6 +92,7 @@ git clone --recursive https://github.com/WhiteboardLiveCoding/ActiveLearningPlat
 
 echo "Changing directories..."
 cd alp
+git checkout convert-images-to-dataset
 
 echo "Installing project requirements..."
 pip3 install -r requirements.txt
