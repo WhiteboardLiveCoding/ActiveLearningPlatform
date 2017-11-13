@@ -1,7 +1,7 @@
 azure.storage.blob
 opencv-python
 numpy
-pillow
+Pillow
 scipy
 
 git+git://github.com/WhiteboardLiveCoding/ImageSegmentation.git
