@@ -96,6 +96,7 @@ command -v git >/dev/null 2>&1 || { echo "Missing git."; install_git; }
 command -v python3 >/dev/null 2>&1 || { echo "Missing python."; install_python3; }
 command -v pip3 >/dev/null 2>&1 || { echo "Missing pip."; install_pip3; }
 command -v az >/dev/null 2>&1 || { echo "Missing azure cli."; install_azure; }
+pip3 install --upgrade pip
 
 echo "Cloning WhiteboardLiveCoding/ActiveLearningPlatform..."
 git clone --recursive https://github.com/WhiteboardLiveCoding/ActiveLearningPlatform.git alp
@@ -107,60 +108,56 @@ git checkout convert-images-to-dataset
 echo "Installing project requirements..."
 install_special_deps
 pip3 install --user -r requirements.txt
-pip3 list
 
 echo "Running [alp.py]..."
 python3 alp.py -i pictures -a code
 
 if [ $? -eq 69 ]; then
     exit 0
-else
-    exit 1
 fi
 
-echo "Downloading the base datasets..."
-dataset_tar="datasets.tar.gz"
-az storage blob download --container-name $container \
-                         --file $dataset_tar \
-                         --name $dataset_tar \
-                         --account-key $blob_key \
-                         --account-name $blob_account || { exit 1; }
-
-tar xzvf $dataset_tar || { exit 1; }
-mv dataset training
-
-echo "Running the training on the generated dataset..."
-cp artifacts/alp.mat training/dataset
-cd training
-
-# TODO: Get all the base datasets
-python3 training.py \
-    --datasets dataset/emnist.mat dataset/wlc.mat dataset/alp.mat \
-    -m japanese \
-    -o o_japanese \
-    -g 4 -p -v 2 \
-    2>&1 | tee training.txt
-
-cp training.txt ../
-cd ..
-
-echo "Copying generated model to wlc for benchmarking..."
-cp training/o_japanese/model.yaml wlc/WLC/ocr/model
-cp training/o_japanese/model.h5 wlc/WLC/ocr/model
-
-echo "Running benchmarks..."
-cd wlc
-python3 benchmark.py 2>&1 | tee benchmark.txt
-
-cp benchmark.txt ../
-cd ..
+#echo "Downloading the base datasets..."
+#dataset_tar="datasets.tar.gz"
+#az storage blob download --container-name $container \
+#                         --file $dataset_tar \
+#                         --name $dataset_tar \
+#                         --account-key $blob_key \
+#                         --account-name $blob_account || { exit 1; }
+#
+#tar xzvf $dataset_tar || { exit 1; }
+#mv dataset training
+#
+#echo "Running the training on the generated dataset..."
+#cp artifacts/alp.mat training/dataset
+#cd training
+#
+#python3 training.py \
+#    --datasets dataset/emnist.mat dataset/wlc.mat dataset/alp.mat \
+#    -m japanese \
+#    -o o_japanese \
+#    -g 4 -p -v 2 \
+#    2>&1 | tee training.txt
+#
+#cp training.txt ../
+#cd ..
+#
+#echo "Copying generated model to wlc for benchmarking..."
+#cp training/o_japanese/model.yaml wlc/WLC/ocr/model
+#cp training/o_japanese/model.h5 wlc/WLC/ocr/model
+#
+#echo "Running benchmarks..."
+#cd wlc
+#python3 benchmark.py 2>&1 | tee benchmark.txt
+#
+#cp benchmark.txt ../
+#cd ..
 
 echo "Creating the tarball..."
-mv training/o_japanese ./
+#mv training/o_japanese ./
 timestamp=$(date -u +"%Y-%m-%d-%H-%M-%S")
 filename="alp-$timestamp.tar"
 
-tar cvf $filename o_japanese artifacts training.txt benchmark.txt \
+tar cvf $filename artifacts \
     || { echo "Tarball couldn't be generated."; exit 1; }
 
 echo "Create appropriate Azure Blob container..."
