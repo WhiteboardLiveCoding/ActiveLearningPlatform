@@ -29,6 +29,16 @@ install_pip3()
 	sudo apt -y install python3-pip || exit 1
 }
 
+install_pillow()
+{
+    echo "Installing Pillow..."
+    sudo apt-get -y install python3-dev python3-setuptools
+    sudo apt-get -y install libtiff5-dev libjpeg8-dev zlib1g-dev \
+        libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python-tk
+    pip3 install Pillow
+
+}
+
 install_azure()
 {
 	echo "Installing azure cli..."
@@ -95,8 +105,8 @@ cd alp
 git checkout convert-images-to-dataset
 
 echo "Installing project requirements..."
+install_pillow
 pip3 install -r requirements.txt
-pip3 list
 
 echo "Running [alp.py]..."
 python3 alp.py -i pictures -a code
