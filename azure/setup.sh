@@ -106,7 +106,7 @@ git checkout convert-images-to-dataset
 
 echo "Installing project requirements..."
 install_special_deps
-pip3 install -r requirements.txt
+pip3 install --user -r requirements.txt
 pip3 list
 
 echo "Running [alp.py]..."
