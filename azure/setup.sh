@@ -1,5 +1,7 @@
 #!/bin/sh
 
+sudo nvidia-smi
+
 usage()
 {
 	echo "usage: setup.sh"
