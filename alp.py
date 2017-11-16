@@ -25,7 +25,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(usage='Active Learning Platform to keep on learning')
     parser.add_argument('-i', '--image-container', type=str, help='azure blob image container', default='pictures')
     parser.add_argument('-a', '--annotation-container', type=str,
-                        help='azure blob annotation container', default='annotations')
+                        help='azure blob annotation container', default='code')
 
     return parser.parse_args()
 
