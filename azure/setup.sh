@@ -6,52 +6,14 @@ usage()
 	echo "\t[-h | --help]"
 	echo "\t[-a | --account ACCOUNT]"
 	echo "\t[-k | --key KEY]"
-}
-
-install_git()
-{
-	echo "Installing git..."
-	sudo apt update
-	sudo apt -y install git || exit 1
-}
-
-install_python3()
-{
-	echo "Installing python3..."
-	sudo apt update
-	sudo apt -y install python3 || exit 1
-}
-
-install_pip3()
-{
-	echo "Installing pip3..."
-	sudo apt update
-	sudo apt -y install python3-pip || exit 1
-}
-
-install_special_deps()
-{
-    echo "Installing Pillow..."
-    sudo apt-get -y install python3-dev python3-setuptools
-    sudo apt-get -y install libtiff5-dev libjpeg8-dev zlib1g-dev \
-        libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python-tk
-    pip3 install Pillow
-    sudo apt-get -y install python-numpy python-scipy
-}
-
-install_azure()
-{
-	echo "Installing azure cli..."
-    echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | \
-     sudo tee /etc/apt/sources.list.d/azure-cli.list
-    sudo apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893
-    sudo apt-get -y install apt-transport-https || exit 1
-    sudo apt-get update && sudo apt-get -y install azure-cli || exit 1
+	echo "\t[-u | --cr-username ACCOUNT]"
+	echo "\t[-p | --cr-password KEY]"
 }
 
 blob_account=""
 blob_key=""
-container="alp"
+cr_username=""
+cr_password=""
 
 while [ "$1" != "" ]; do
 	case $1 in
@@ -66,6 +28,14 @@ while [ "$1" != "" ]; do
 		-k | --key)
 			shift
 			blob_key=$1
+			;;
+		-u | --cr-username)
+			shift
+			cr_username=$1
+			;;
+		-p | --cr-password)
+			shift
+			cr_password=$1
 			;;
 		*)
 			echo "ERROR: unknown parameter \"$1\""
@@ -86,96 +56,23 @@ if [[ -z "$blob_key" ]]; then
     exit 1
 fi
 
-export BLOB_ACCOUNT=$blob_account
-export BLOB_KEY=$blob_key
+if [[ -z "$cr_username" ]]; then
+    echo "Please provide the Container Registry username"
+    exit 1
+fi
+
+if [[ -z "$cr_password" ]]; then
+    echo "Please provide the Container Registry password"
+    exit 1
+fi
 
 echo "Bootstraping Active Learning Platform..."
 
-echo "Checking requirements..."
-command -v git >/dev/null 2>&1 || { echo "Missing git."; install_git; }
-command -v python3 >/dev/null 2>&1 || { echo "Missing python."; install_python3; }
-command -v pip3 >/dev/null 2>&1 || { echo "Missing pip."; install_pip3; }
-command -v az >/dev/null 2>&1 || { echo "Missing azure cli."; install_azure; }
-pip3 install --upgrade pip
-
-echo "Cloning WhiteboardLiveCoding/ActiveLearningPlatform..."
-git clone --recursive https://github.com/WhiteboardLiveCoding/ActiveLearningPlatform.git alp
-
-echo "Changing directories..."
-cd alp
-git checkout convert-images-to-dataset
-
-echo "Installing project requirements..."
-install_special_deps
-pip3 install --user -r requirements.txt
-
-echo "Running [alp.py]..."
-python3 alp.py -i pictures -a code
-
-if [ $? -eq 69 ]; then
-    exit 0
-fi
-
-#echo "Downloading the base datasets..."
-#dataset_tar="datasets.tar.gz"
-#az storage blob download --container-name $container \
-#                         --file $dataset_tar \
-#                         --name $dataset_tar \
-#                         --account-key $blob_key \
-#                         --account-name $blob_account || { exit 1; }
-#
-#tar xzvf $dataset_tar || { exit 1; }
-#mv dataset training
-#
-#echo "Running the training on the generated dataset..."
-#cp artifacts/alp.mat training/dataset
-#cd training
-#
-#python3 training.py \
-#    --datasets dataset/emnist.mat dataset/wlc.mat dataset/alp.mat \
-#    -m japanese \
-#    -o o_japanese \
-#    -g 4 -p -v 2 \
-#    2>&1 | tee training.txt
-#
-#cp training.txt ../
-#cd ..
-#
-#echo "Copying generated model to wlc for benchmarking..."
-#cp training/o_japanese/model.yaml wlc/WLC/ocr/model
-#cp training/o_japanese/model.h5 wlc/WLC/ocr/model
-#
-#echo "Running benchmarks..."
-#cd wlc
-#python3 benchmark.py 2>&1 | tee benchmark.txt
-#
-#cp benchmark.txt ../
-#cd ..
-
-echo "Creating the tarball..."
-#mv training/o_japanese ./
-timestamp=$(date -u +"%Y-%m-%d-%H-%M-%S")
-filename="alp-$timestamp.tar"
-
-tar cvf $filename artifacts \
-    || { echo "Tarball couldn't be generated."; exit 1; }
-
-echo "Create appropriate Azure Blob container..."
-az storage container create --name $container \
-                            --account-key $blob_key \
-                            --account-name $blob_account
-
-echo "Uploading the tarball to Azure Blob Storage..."
-az storage blob upload --container-name $container \
-                       --file $filename \
-                       --name $filename \
-                       --account-key $blob_account \
-                       --account-name $blob_key || { exit 1; }
-
-echo "Verifying uploaded blob..."
-az storage blob exists --container-name $container \
-                       --name $filename \
-                       --account-key $blob_account \
-                       --account-name $blob_key || { exit 1; }
-
-echo "Process completed."
+sudo nvidia-docker login -u ${cr_username} -p ${cr_password}
+sudo nvidia-docker pull whiteboardlivecoding.azurecr.io/alp
+sudo nvidia-docker run -it \
+    -e BLOB_ACCOUNT="$blob_account" \
+    -e BLOB_KEY="$blob_key" \
+    -e CR_USERNAME="$cr_username" \
+    -e CR_PASSWORD="$cr_password" \
+    whiteboardlivecoding.azurecr.io/alp
