@@ -23,6 +23,6 @@ RUN mkdir /alp
 COPY . /alp
 
 WORKDIR /alp
-RUN chmod +x azure/alp.sh
+RUN chmod +x scripts/alp.sh
 
-CMD ["azure/alp.sh"]
+CMD ["scripts/alp.sh"]
