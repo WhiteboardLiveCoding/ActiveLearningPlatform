@@ -74,7 +74,7 @@ sudo nvidia-docker login whiteboardlivecoding.azurecr.io \
 
 sudo nvidia-docker pull whiteboardlivecoding.azurecr.io/alp
 
-sudo nvidia-docker run -it \
+sudo nvidia-docker run \
     -e BLOB_ACCOUNT="$blob_account" \
     -e BLOB_KEY="$blob_key" \
     -e CR_USERNAME="$cr_username" \
