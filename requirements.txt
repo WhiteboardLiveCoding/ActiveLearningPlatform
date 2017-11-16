@@ -2,6 +2,19 @@ azure.storage.blob
 opencv-python
 numpy
 scipy
+Pillow
+fuzzysearch
+editdistance
+imutils
+scikit-image
+keras
+h5py
+docker
+pytest
+regex
+stdlib_list
+Flask
+hyperas
+hyperopt
 
 git+git://github.com/WhiteboardLiveCoding/ImageSegmentation.git
-Pillow
