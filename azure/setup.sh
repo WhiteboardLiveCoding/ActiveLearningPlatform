@@ -68,8 +68,12 @@ fi
 
 echo "Bootstraping Active Learning Platform..."
 
-sudo nvidia-docker login -u ${cr_username} -p ${cr_password}
+sudo nvidia-docker login whiteboardlivecoding.azurecr.io \
+	-u ${cr_username} \
+	-p ${cr_password}
+
 sudo nvidia-docker pull whiteboardlivecoding.azurecr.io/alp
+
 sudo nvidia-docker run -it \
     -e BLOB_ACCOUNT="$blob_account" \
     -e BLOB_KEY="$blob_key" \
