@@ -28,7 +28,7 @@ python3 training.py \
     --datasets dataset/emnist.mat dataset/wlc.mat dataset/alp.mat \
     -m japanese \
     -o o_japanese \
-    -g 4 -p -v 2 -e 1 \
+    -g 4 -p -v 2 \
     2>&1 | tee training.txt
 
 cp training.txt ../
