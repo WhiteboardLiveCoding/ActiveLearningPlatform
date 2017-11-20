@@ -1,0 +1,6 @@
+[submodule "training"]
+	path = training
+	url = https://github.com/WhiteboardLiveCoding/OCRTraining
+[submodule "wlc"]
+	path = wlc
+	url = https://github.com/WhiteboardLiveCoding/WhiteboardLiveCoding

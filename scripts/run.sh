@@ -2,15 +2,17 @@
 
 RESOURCE_GROUP="ALP"
 VM_NAME="alp-training"
-SETTINGS="azure/public.json"
+PUBLIC="azure/public.json"
+PRIVATE="azure/private.json"
 START_VM=0
 
 usage()
 {
 	echo "usage: deploy.sh"
 	echo "\t[-h | --help]"
-	echo "\t[-s | --settings SETTINGS]"
-	echo "\t[-g | -resource-group RESOURCE_GROUP]"
+	echo "\t[--public PUBLIC]"
+	echo "\t[--private PRIVATE]"
+	echo "\t[-g | --resource-group RESOURCE_GROUP]"
 	echo "\t[-n | --vm-name VM_NAME]"
 	echo "\t[-st | --start-vm]"
 }
@@ -21,9 +23,13 @@ while [ "$1" != "" ]; do
 			usage
 			exit
 			;;
-		-s | --settings)
+		--public)
 			shift
-			SETTINGS=$1
+			PUBLIC=$1
+			;;
+		--private)
+			shift
+			PRIVATE=$1
 			;;
 		-g | --resource-group)
 			shift
@@ -54,7 +60,7 @@ set -e
 
 echo "Please make sure that you have logged into the Azure CLI"
 
-if [ $START_VM -gt 1 ]
+if [ $START_VM -eq 1 ]
 then
 	echo "Starting vm '$VM_NAME' in the '$RESOURCE_GROUP' resource group..."
 	az vm start -g $RESOURCE_GROUP -n $VM_NAME
@@ -66,7 +72,7 @@ az vm extension set \
 	--vm-name $VM_NAME \
 	--name CustomScript \
 	--publisher Microsoft.Azure.Extensions --version 2.0 \
-	--settings $SETTINGS \
-	--no-wait
+	--settings $PUBLIC \
+	--protected-settings $PRIVATE
 
 echo "CustomScript deployed!"
